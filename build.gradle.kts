@@ -4,7 +4,7 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
     kotlin("jvm") version "1.5.21"
-    id("org.jetbrains.compose") version "1.0.0-alpha1"
+    id("org.jetbrains.compose") version "1.0.0-alpha3"
 }
 
 group = "me.xxslayerxx"
@@ -18,6 +18,8 @@ repositories {
 }
 
 dependencies {
+    testImplementation("org.junit.jupiter:junit-jupiter:5.7.2")
+    testImplementation("org.amshove.kluent:kluent:1.68")
     testImplementation(kotlin("test"))
     implementation(compose.desktop.currentOs)
 }
@@ -27,7 +29,7 @@ tasks.test {
 }
 
 tasks.withType<KotlinCompile>() {
-    kotlinOptions.jvmTarget = "13"
+    kotlinOptions.jvmTarget = "16"
 }
 
 compose.desktop {

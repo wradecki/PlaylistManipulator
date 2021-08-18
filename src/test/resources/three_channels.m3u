@@ -1,0 +1,7 @@
+#EXTM3U
+#EXTINF:-1 tvg-id="rmcsportuhd.fr" tvg-name="FR: RMC SPORT UHD" tvg-logo="http://logo.sltv.site/logo/franceT-220x132/RMCACCESS1.png" group-title="FR FRANCE FHD",FR: RMC SPORT UHD
+http://ip.sltv.be:8080/3hmm2173811/t9M4av1LUm/198241
+#EXTINF:-1 tvg-id="" tvg-name="-----AFRICA-----" tvg-logo="http://logo.sltv.site/logo/flag/africa.png" group-title="AF AFRICA",-----AFRICA-----
+http://ip.sltv.be:8080/3hmm2173811/t9M4av1LUm/135951
+#EXTINF:-1 tvg-id="" tvg-name="AF: TFM SENEGAL" tvg-logo="" group-title="AF AFRICA",AF: TFM SENEGAL
+http://ip.sltv.be:8080/3hmm2173811/t9M4av1LUm/1018
