@@ -1,4 +1,4 @@
-package com.wradecki.View
+package com.wradecki.view
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.snapshots.SnapshotStateList
@@ -36,10 +36,9 @@ fun FrameWindowScope.MenuRow(
     }
 }
 
-private fun parseList(file: File?, lists: SnapshotStateList<SingleList>, trayState: TrayState) {
+private fun parseList(file: File?, lists: MutableList<SingleList>, trayState: TrayState) {
     val parser = SltvParser()
-    val result = parser.parse(file!!.path)
-    when (result) {
+    when (val result = parser.parse(file!!.path)) {
         is ParseSuccess -> {
             lists += result.list
             trayState.sendNotification(Notification("Success", "List added successfully", Notification.Type.Info))
