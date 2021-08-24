@@ -22,6 +22,7 @@ fun <T : Selectable> SimplePanel(
     items: SnapshotStateList<T>,
     listModifier: Modifier = Modifier,
     onClick: (T) -> Unit = {},
+    onSelect: (T, Boolean) -> Unit = { _, _ -> {} },
     descriptionPanel: @Composable (T) -> Unit = { Text(text = it.name, modifier = Modifier.fillMaxHeight()) }
 ) {
     Column(
@@ -65,6 +66,8 @@ fun <T : Selectable> SimplePanel(
                                 onCheckedChange = { checked ->
                                     rememberedItem.value = checked
                                     singleItem.selected = checked
+                                    singleItem.select(checked)
+                                    onSelect(singleItem, checked)
                                 },
                                 checked = rememberedItem.value,
                                 modifier = Modifier.fillMaxHeight().padding(end = 25.dp)

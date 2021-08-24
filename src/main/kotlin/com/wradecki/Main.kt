@@ -8,9 +8,8 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.material.darkColors
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateListOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.*
+import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.*
@@ -48,6 +47,9 @@ private fun FrameWindowScope.App() {
     val groups = remember { mutableStateListOf<Group>() }
     val channels = remember { mutableStateListOf<Channel>() }
 
+    var currentList = remember { mutableStateOf<SingleList?>(null) }
+    var currentGroup = remember { mutableStateOf<Group?>(null) }
+
     DesktopMaterialTheme(colors = darkColors()) {
         Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colors.surface) {
             Tray(
@@ -56,20 +58,55 @@ private fun FrameWindowScope.App() {
             )
             MenuRow(lists, trayState)
             Row {
-                SimplePanel("Lists", listModifier = Modifier.width(300.dp), items = lists, onClick = {
-                    groups.clear()
-                    groups += it.groups
-                    channels.clear()
-                })
-                SimplePanel("Groups", listModifier = Modifier.width(400.dp), items = groups, onClick = {
-                    channels.clear()
-                    channels += it.channels
-                })
+                SimplePanel("Lists",
+                    listModifier = Modifier.width(300.dp), items = lists,
+                    onClick = {
+                        groups.clear()
+                        groups += it.groups
+                        channels.clear()
+                        currentList.value = it
+                    }, onSelect = { item, checked ->
+                        refreshCurrentList(currentList, item, groups, currentGroup, channels)
+                    }
+                )
+                SimplePanel("Groups",
+                    listModifier = Modifier.width(400.dp),
+                    items = groups,
+                    onClick = {
+                        channels.clear()
+                        channels += it.channels
+                        currentGroup.value = it
+                        refreshCurrentGroup(currentGroup, channels)
+                    })
                 SimplePanel("Channels", listModifier = Modifier.fillMaxWidth(), items = channels) { singleChannel ->
                     ChannelCard(singleChannel)
                 }
             }
         }
+    }
+}
+
+private fun refreshCurrentList(
+    currentList: MutableState<SingleList?>,
+    item: SingleList,
+    groups: SnapshotStateList<Group>,
+    currentGroup: MutableState<Group?>,
+    channels: SnapshotStateList<Channel>
+) {
+    if (currentList.value == item) {
+        groups.clear()
+        groups += currentList.value!!.groups
+        refreshCurrentGroup(currentGroup, channels)
+    }
+}
+
+private fun refreshCurrentGroup(
+    currentGroup: MutableState<Group?>,
+    channels: SnapshotStateList<Channel>
+) {
+    if (currentGroup.value != null) {
+        channels.clear()
+        channels += currentGroup.value!!.channels
     }
 }
 

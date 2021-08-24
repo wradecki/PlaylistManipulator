@@ -6,4 +6,8 @@ data class Channel(
     val logoUrl: String,
     val url: String,
     val information: String = "-1"
-) : Selectable(name)
+) : Selectable(name) {
+    override fun select(selected: Boolean) {
+        this.selected = selected
+    }
+}
