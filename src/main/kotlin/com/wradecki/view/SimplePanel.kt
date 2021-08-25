@@ -3,6 +3,7 @@ package com.wradecki.view
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
@@ -20,6 +21,9 @@ import com.wradecki.model.Selectable
 fun <T : Selectable> SimplePanel(
     header: String,
     items: SnapshotStateList<T>,
+    currentItem: T? = null,
+    isClickable: Boolean = true,
+    lazyListState: LazyListState,
     listModifier: Modifier = Modifier,
     onClick: (T) -> Unit = {},
     onSelect: (T, Boolean) -> Unit = { _, _ -> },
@@ -38,19 +42,25 @@ fun <T : Selectable> SimplePanel(
                     width = 1.dp
                 )
                 .padding(25.dp)
-                .fillMaxSize()
+                .fillMaxSize(),
+            state = lazyListState
         ) {
             items(items) { singleItem ->
                 Card(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(5.dp)
-                        .clickable {
+                        .clickable(enabled = isClickable) {
                             onClick(singleItem)
                         }
                 ) {
                     Column(
-                        modifier = Modifier
+                        modifier =
+                        if (currentItem == singleItem) Modifier
+                            .fillMaxWidth()
+                            .background(MaterialTheme.colors.secondary)
+                            .padding(15.dp)
+                        else Modifier
                             .fillMaxWidth()
                             .padding(15.dp)
                     ) {

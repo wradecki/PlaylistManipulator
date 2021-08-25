@@ -19,12 +19,12 @@ import com.wradecki.model.Channel
 import com.wradecki.model.Group
 import com.wradecki.model.SingleList
 import com.wradecki.view.*
-
+import kotlinx.coroutines.launch
 
 fun main() = singleWindowApplication(
     title = "Playlist manipulator",
     icon = MyAppIcon,
-    state = WindowState(size = WindowSize(1920.dp, 1080.dp))
+    state = WindowState(size = WindowSize(1600.dp, 900.dp))
 ) {
     App()
 }
@@ -43,7 +43,10 @@ private fun FrameWindowScope.App() {
             MenuRow(lists, trayState)
             Row {
                 SimplePanel("Lists",
-                    listModifier = Modifier.width(300.dp), items = lists,
+                    listModifier = Modifier.width(300.dp),
+                    items = lists,
+                    currentItem = currentList.value,
+                    lazyListState = listListState,
                     onClick = {
                         groups.clear()
                         groups += it.groups
@@ -56,13 +59,21 @@ private fun FrameWindowScope.App() {
                 SimplePanel("Groups",
                     listModifier = Modifier.width(400.dp),
                     items = groups,
+                    currentItem = currentGroup.value,
+                    lazyListState = groupListState,
                     onClick = {
                         channels.clear()
                         channels += it.channels
                         currentGroup.value = it
                         refreshCurrentGroup(currentGroup, channels)
                     })
-                SimplePanel("Channels", listModifier = Modifier.fillMaxWidth(), items = channels) { singleChannel ->
+                SimplePanel(
+                    "Channels",
+                    listModifier = Modifier.fillMaxWidth(),
+                    items = channels,
+                    isClickable = false,
+                    lazyListState = channelListState,
+                ) { singleChannel ->
                     ChannelCard(singleChannel)
                 }
             }
@@ -80,6 +91,9 @@ private fun refreshCurrentList(
     if (currentList.value == item) {
         groups.clear()
         groups += currentList.value!!.groups
+        coroutineScope.launch {
+            groupListState.animateScrollToItem(index = 0)
+        }
         refreshCurrentGroup(currentGroup, channels)
     }
 }
@@ -91,6 +105,9 @@ private fun refreshCurrentGroup(
     if (currentGroup.value != null) {
         channels.clear()
         channels += currentGroup.value!!.channels
+        coroutineScope.launch {
+            channelListState.scrollToItem(index = 0)
+        }
     }
 }
 

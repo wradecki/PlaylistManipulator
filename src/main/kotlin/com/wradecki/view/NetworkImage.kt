@@ -17,20 +17,28 @@ import javax.imageio.ImageIO
 @Composable
 fun NetworkImage(url: String) {
     if (url.isNotBlank()) {
-        Column {
-            Image(bitmap = loadNetworkImage(url), contentDescription = null, modifier = Modifier.width(150.dp))
+        val image = loadNetworkImage(url)
+        if (image != null) {
+            Column {
+                Image(bitmap = image, contentDescription = null, modifier = Modifier.width(150.dp))
+            }
         }
     }
 }
 
-private fun loadNetworkImage(url: String): ImageBitmap {
-    val connection = initConnection(url)
-    val redirect = isRedirect(connection)
+private fun loadNetworkImage(url: String): ImageBitmap? {
+    return try {
+        val connection = initConnection(url)
+        val redirect = isRedirect(connection)
 
-    return if (redirect) loadNewNetworkImage(connection) else loadImage(connection)
+        if (redirect) loadNewNetworkImage(connection) else loadImage(connection)
+    } catch (ex: Exception) {
+        null
+    }
+
 }
 
-private fun loadNewNetworkImage(connection: HttpURLConnection): ImageBitmap {
+private fun loadNewNetworkImage(connection: HttpURLConnection): ImageBitmap? {
     return loadNetworkImage(getNewUrl(connection))
 }
 
