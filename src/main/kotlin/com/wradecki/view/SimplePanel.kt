@@ -7,12 +7,13 @@ import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.wradecki.model.Selectable
@@ -20,7 +21,7 @@ import com.wradecki.model.Selectable
 @Composable
 fun <T : Selectable> SimplePanel(
     header: String,
-    items: SnapshotStateList<T>,
+    items: MutableList<T>,
     currentItem: T? = null,
     isClickable: Boolean = true,
     lazyListState: LazyListState,
@@ -34,7 +35,17 @@ fun <T : Selectable> SimplePanel(
             .fillMaxHeight()
             .padding(10.dp)
     ) {
+        val textState: MutableState<TextFieldValue> = remember { mutableStateOf(TextFieldValue("")) }
         Text(header, fontStyle = MaterialTheme.typography.h1.fontStyle, textAlign = TextAlign.Center, modifier = Modifier.fillMaxWidth())
+
+        TextField(
+            modifier = Modifier.fillMaxWidth()
+                .padding(15.dp),
+            value = textState.value,
+            onValueChange = { text ->
+                textState.value = text
+            }
+        )
         LazyColumn(
             modifier = Modifier
                 .border(
@@ -45,7 +56,16 @@ fun <T : Selectable> SimplePanel(
                 .fillMaxSize(),
             state = lazyListState
         ) {
-            items(items) { singleItem ->
+            val currentItems = if (textState.value == TextFieldValue("")) items else {
+                val filteredItems = items.filter {
+                    println(it.name)
+                    println(textState.value.text)
+                    it.name.lowercase().contains(textState.value.text.lowercase())
+                }
+                println(filteredItems.size)
+                filteredItems
+            }
+            items(currentItems) { singleItem ->
                 Card(
                     modifier = Modifier
                         .fillMaxWidth()

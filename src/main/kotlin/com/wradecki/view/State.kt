@@ -4,6 +4,7 @@ import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.runtime.*
 import androidx.compose.runtime.snapshots.SnapshotStateList
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.window.TrayState
 import androidx.compose.ui.window.rememberTrayState
 import com.wradecki.model.Channel
@@ -26,6 +27,11 @@ lateinit var listListState: LazyListState
 lateinit var groupListState: LazyListState
 lateinit var channelListState: LazyListState
 
+lateinit var listSearchState: MutableState<TextFieldValue>
+lateinit var groupSearchState: MutableState<TextFieldValue>
+lateinit var channelSearchState: MutableState<TextFieldValue>
+
+
 @Composable
 fun InitState() {
     coroutineScope = rememberCoroutineScope()
@@ -43,4 +49,8 @@ fun InitState() {
     listListState = rememberLazyListState(0)
     groupListState = rememberLazyListState(0)
     channelListState = rememberLazyListState(0)
+
+    listSearchState = remember { mutableStateOf(TextFieldValue()) }
+    groupSearchState = remember { mutableStateOf(TextFieldValue()) }
+    channelSearchState = remember { mutableStateOf(TextFieldValue()) }
 }
