@@ -1,4 +1,5 @@
-// Copyright 2000-2021 JetBrains s.r.o. and contributors. Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE file.
+package com.wradecki
+
 import androidx.compose.desktop.DesktopMaterialTheme
 import androidx.compose.desktop.ui.tooling.preview.Preview
 import androidx.compose.foundation.layout.Row
@@ -8,7 +9,8 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.material.darkColors
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -30,25 +32,7 @@ fun main() = singleWindowApplication(
 @Composable
 @Preview
 private fun FrameWindowScope.App() {
-    val trayState = rememberTrayState()
-
-    val lists = remember {
-        mutableStateListOf(
-            SingleList(
-                "some",
-                "path",
-                listOf(Group("jakas", listOf(Channel("someId", "some name", "http://logo.sltv.site/logo/franceT-220x132/RMCACCESS1.png", "http://ip.sltv.be:8080/3hmm2173811/t9M4av1LUm/198241"))))
-            ),
-            SingleList("second", "path", listOf(Group("inna", emptyList()), Group("trzecia", emptyList()))),
-            SingleList("third longer name, much longer", "path", emptyList())
-        )
-    }
-
-    val groups = remember { mutableStateListOf<Group>() }
-    val channels = remember { mutableStateListOf<Channel>() }
-
-    var currentList = remember { mutableStateOf<SingleList?>(null) }
-    var currentGroup = remember { mutableStateOf<Group?>(null) }
+    InitState()
 
     DesktopMaterialTheme(colors = darkColors()) {
         Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colors.surface) {
@@ -65,7 +49,7 @@ private fun FrameWindowScope.App() {
                         groups += it.groups
                         channels.clear()
                         currentList.value = it
-                    }, onSelect = { item, checked ->
+                    }, onSelect = { item, _ ->
                         refreshCurrentList(currentList, item, groups, currentGroup, channels)
                     }
                 )

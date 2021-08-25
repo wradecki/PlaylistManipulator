@@ -22,12 +22,13 @@ fun <T : Selectable> SimplePanel(
     items: SnapshotStateList<T>,
     listModifier: Modifier = Modifier,
     onClick: (T) -> Unit = {},
-    onSelect: (T, Boolean) -> Unit = { _, _ -> {} },
+    onSelect: (T, Boolean) -> Unit = { _, _ -> },
     descriptionPanel: @Composable (T) -> Unit = { Text(text = it.name, modifier = Modifier.fillMaxHeight()) }
 ) {
     Column(
         modifier = listModifier
             .fillMaxHeight()
+            .padding(10.dp)
     ) {
         Text(header, fontStyle = MaterialTheme.typography.h1.fontStyle, textAlign = TextAlign.Center, modifier = Modifier.fillMaxWidth())
         LazyColumn(
@@ -40,8 +41,7 @@ fun <T : Selectable> SimplePanel(
                 .fillMaxSize()
         ) {
             items(items) { singleItem ->
-                @OptIn(ExperimentalFoundationApi::class)
-                (Card(
+                Card(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(5.dp)
@@ -85,7 +85,7 @@ fun <T : Selectable> SimplePanel(
                             Text(text = "Delete", color = MaterialTheme.colors.onError)
                         }
                     }
-                })
+                }
             }
         }
         VerticalScrollbar(rememberScrollbarAdapter(rememberScrollState(0)), modifier = Modifier.width(10.dp).fillMaxHeight().padding(10.dp))
