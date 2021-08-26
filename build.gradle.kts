@@ -22,6 +22,9 @@ dependencies {
     testImplementation("org.amshove.kluent:kluent:1.68")
     testImplementation(kotlin("test"))
     implementation(compose.desktop.currentOs)
+    // https://mvnrepository.com/artifact/uk.co.caprica/vlcj
+    implementation("uk.co.caprica:vlcj:4.7.1")
+    implementation("br.com.devsrsouza.compose.icons.jetbrains:font-awesome:1.0.0")
 }
 
 tasks.test {

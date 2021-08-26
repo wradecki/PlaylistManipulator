@@ -11,10 +11,19 @@ import com.wradecki.model.Channel
 import com.wradecki.model.Group
 import com.wradecki.model.SingleList
 import kotlinx.coroutines.CoroutineScope
+import uk.co.caprica.vlcj.factory.discovery.NativeDiscovery
+import uk.co.caprica.vlcj.player.component.CallbackMediaPlayerComponent
+import uk.co.caprica.vlcj.player.component.EmbeddedMediaPlayerComponent
+import java.awt.Component
+import java.util.*
 
+lateinit var mediaPlayerComponent: Component
 lateinit var coroutineScope: CoroutineScope
 
 lateinit var trayState: TrayState
+
+lateinit var playerUrl: MutableState<String>
+lateinit var isPlaying: MutableState<Boolean>
 
 lateinit var lists: SnapshotStateList<SingleList>
 lateinit var groups: SnapshotStateList<Group>
@@ -38,6 +47,12 @@ fun InitState() {
 
     trayState = rememberTrayState()
 
+    initPlayer()
+    initLists()
+}
+
+@Composable
+private fun initLists() {
     lists = remember { mutableStateListOf() }
     groups = remember { mutableStateListOf() }
     channels = remember { mutableStateListOf() }
@@ -53,4 +68,25 @@ fun InitState() {
     listSearchState = remember { mutableStateOf(TextFieldValue()) }
     groupSearchState = remember { mutableStateOf(TextFieldValue()) }
     channelSearchState = remember { mutableStateOf(TextFieldValue()) }
+}
+
+@Composable
+private fun initPlayer() {
+    playerUrl = remember { mutableStateOf("") }
+    isPlaying = remember { mutableStateOf(true) }
+
+    NativeDiscovery().discover()
+    mediaPlayerComponent = remember {
+        if (isMacOS()) {
+            CallbackMediaPlayerComponent()
+        } else {
+            EmbeddedMediaPlayerComponent()
+        }
+    }
+}
+
+
+private fun isMacOS(): Boolean {
+    val os = System.getProperty("os.name", "generic").lowercase(Locale.ENGLISH)
+    return os.indexOf("mac") >= 0 || os.indexOf("darwin") >= 0
 }
