@@ -58,11 +58,8 @@ fun <T : Selectable> SimplePanel(
         ) {
             val currentItems = if (textState.value == TextFieldValue("")) items else {
                 val filteredItems = items.filter {
-                    println(it.name)
-                    println(textState.value.text)
                     it.name.lowercase().contains(textState.value.text.lowercase())
                 }
-                println(filteredItems.size)
                 filteredItems
             }
             items(currentItems) { singleItem ->

@@ -22,7 +22,6 @@ internal fun VideoPlayerImpl(url: String, modifier: Modifier) {
     SideEffect {
         val mediaPlayer = mediaPlayerComponent.mediaPlayer()
         val ok = mediaPlayer.media().play(url)
-        println("play gave $ok")
     }
     return SwingPanel(
         background = Color.Transparent,

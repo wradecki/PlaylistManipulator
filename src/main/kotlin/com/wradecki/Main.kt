@@ -3,11 +3,14 @@ package com.wradecki
 import androidx.compose.desktop.DesktopMaterialTheme
 import androidx.compose.desktop.ui.tooling.preview.Preview
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.*
+import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Surface
+import androidx.compose.material.darkColors
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.*
 import com.wradecki.model.Channel
@@ -15,10 +18,7 @@ import com.wradecki.model.Group
 import com.wradecki.model.SingleList
 import com.wradecki.view.*
 import com.wradecki.view.video.VideoPlayer
-import com.wradecki.view.video.mediaPlayer
-import compose.icons.FontAwesomeIcons
-import compose.icons.fontawesomeicons.Solid
-import compose.icons.fontawesomeicons.solid.*
+import com.wradecki.view.video.VideoPlayerButtons
 import kotlinx.coroutines.launch
 
 fun main() = singleWindowApplication(
@@ -41,57 +41,14 @@ private fun FrameWindowScope.App() {
                 icon = TrayIcon
             )
             MenuRow(lists, trayState)
-            Column(modifier = Modifier.fillMaxSize()) {
+            Column(modifier = Modifier.fillMaxSize().onSizeChanged {
+                workspaceHeight.value = it.height
+            }) {
                 if (playerUrl.value.isNotBlank()) {
-                    Row(modifier = Modifier.fillMaxWidth().height(450.dp)) {
-                        VideoPlayer(playerUrl.value, modifier = Modifier.fillMaxWidth().height(450.dp))
+                    Row(modifier = Modifier.fillMaxWidth().height(playerHeight.value.dp)) {
+                        VideoPlayer(playerUrl.value, modifier = Modifier.fillMaxSize())
                     }
-                    Row(
-                        modifier = Modifier.fillMaxWidth().height(25.dp),
-                        horizontalArrangement = Arrangement.Center
-                    ) {
-                        Button(onClick = {
-
-                        }) {
-                            Icon(imageVector = FontAwesomeIcons.Solid.StepBackward, "")
-                        }
-
-
-                        if (!isPlaying.value) {
-                            Button(onClick = {
-                                mediaPlayerComponent.mediaPlayer().controls().play()
-                                isPlaying.value = true
-                            }) {
-                                Icon(imageVector = FontAwesomeIcons.Solid.Play, "")
-                            }
-                        }
-                        if (isPlaying.value) {
-                            Button(onClick = {
-                                mediaPlayerComponent.mediaPlayer().controls().pause()
-                                isPlaying.value = false
-                            }) {
-                                Icon(imageVector = FontAwesomeIcons.Solid.Pause, "")
-                            }
-                        }
-
-                        Button(onClick = {
-                            mediaPlayerComponent.mediaPlayer().controls().stop()
-                            mediaPlayerComponent.mediaPlayer().release()
-                            playerUrl.value = ""
-                            isPlaying.value = false
-                        }) {
-                            Icon(imageVector = FontAwesomeIcons.Solid.Stop, "")
-                        }
-
-
-
-
-                        Button(onClick = {
-
-                        }) {
-                            Icon(imageVector = FontAwesomeIcons.Solid.StepForward, "")
-                        }
-                    }
+                    VideoPlayerButtons()
                 }
                 Row {
                     SimplePanel("Lists",
@@ -124,9 +81,11 @@ private fun FrameWindowScope.App() {
                         listModifier = Modifier.fillMaxWidth(),
                         items = channels,
                         lazyListState = channelListState,
+                        currentItem = currentChannel.value,
                         onClick = {
                             playerUrl.value = it.url
                             isPlaying.value = true
+                            currentChannel.value = it
                         }
                     ) { singleChannel ->
                         ChannelCard(singleChannel)
@@ -136,6 +95,7 @@ private fun FrameWindowScope.App() {
         }
     }
 }
+
 
 private fun refreshCurrentList(
     currentList: MutableState<SingleList?>,

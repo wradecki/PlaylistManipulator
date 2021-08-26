@@ -22,8 +22,12 @@ lateinit var coroutineScope: CoroutineScope
 
 lateinit var trayState: TrayState
 
+lateinit var workspaceHeight: MutableState<Int>
+
 lateinit var playerUrl: MutableState<String>
+lateinit var playerHeight: MutableState<Int>
 lateinit var isPlaying: MutableState<Boolean>
+lateinit var isFullScreen: MutableState<Boolean>
 
 lateinit var lists: SnapshotStateList<SingleList>
 lateinit var groups: SnapshotStateList<Group>
@@ -31,6 +35,7 @@ lateinit var channels: SnapshotStateList<Channel>
 
 lateinit var currentList: MutableState<SingleList?>
 lateinit var currentGroup: MutableState<Group?>
+lateinit var currentChannel: MutableState<Channel?>
 
 lateinit var listListState: LazyListState
 lateinit var groupListState: LazyListState
@@ -47,6 +52,8 @@ fun InitState() {
 
     trayState = rememberTrayState()
 
+    workspaceHeight = remember { mutableStateOf(900) }
+
     initPlayer()
     initLists()
 }
@@ -59,6 +66,7 @@ private fun initLists() {
 
     currentList = remember { mutableStateOf(null) }
     currentGroup = remember { mutableStateOf(null) }
+    currentChannel = remember { mutableStateOf(null) }
 
 
     listListState = rememberLazyListState(0)
@@ -73,7 +81,9 @@ private fun initLists() {
 @Composable
 private fun initPlayer() {
     playerUrl = remember { mutableStateOf("") }
+    playerHeight = remember { mutableStateOf(400) }
     isPlaying = remember { mutableStateOf(true) }
+    isFullScreen = remember { mutableStateOf(false) }
 
     NativeDiscovery().discover()
     mediaPlayerComponent = remember {
