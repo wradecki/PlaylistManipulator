@@ -27,8 +27,8 @@ fun FrameWindowScope.MenuRow(
             Item("Load list", onClick = {
                 var file: File?
                 JFileChooser().apply {
-                    showOpenDialog(null)
                     fileFilter = FileNameExtensionFilter("SLTV", "m3u")
+                    showOpenDialog(null)
                     file = selectedFile
                 }
 
