@@ -4,10 +4,14 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.width
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.unit.dp
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import org.jetbrains.skija.Image
 import java.io.ByteArrayOutputStream
 import java.net.HttpURLConnection
@@ -17,10 +21,13 @@ import javax.imageio.ImageIO
 @Composable
 fun NetworkImage(url: String) {
     if (url.isNotBlank()) {
-        val image = loadNetworkImage(url)
-        if (image != null) {
+        val image = remember { mutableStateOf<ImageBitmap?>(null) }
+        GlobalScope.launch {
+            image.value = loadNetworkImage(url)
+        }
+        if (image.value != null) {
             Column {
-                Image(bitmap = image, contentDescription = null, modifier = Modifier.width(150.dp))
+                Image(bitmap = image.value!!, contentDescription = null, modifier = Modifier.width(150.dp))
             }
         }
     }
