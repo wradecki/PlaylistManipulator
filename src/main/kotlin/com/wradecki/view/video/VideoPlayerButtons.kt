@@ -35,7 +35,7 @@ private fun FullScreenButton() {
         onClick = {
             isFullScreen.value = isFullScreen.value.not()
             if (isFullScreen.value) {
-                playerHeight.value = workspaceHeight.value - 50
+                playerHeight.value = workspaceHeight.value - 100
             } else {
                 playerHeight.value = 400
             }

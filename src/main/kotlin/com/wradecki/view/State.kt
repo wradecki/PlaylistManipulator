@@ -28,6 +28,8 @@ lateinit var playerUrl: MutableState<String>
 lateinit var playerHeight: MutableState<Int>
 lateinit var isPlaying: MutableState<Boolean>
 lateinit var isFullScreen: MutableState<Boolean>
+lateinit var videoTime: MutableState<Float>
+lateinit var isSeekable: MutableState<Boolean>
 
 lateinit var lists: SnapshotStateList<SingleList>
 lateinit var groups: SnapshotStateList<Group>
@@ -84,6 +86,8 @@ private fun initPlayer() {
     playerHeight = remember { mutableStateOf(400) }
     isPlaying = remember { mutableStateOf(true) }
     isFullScreen = remember { mutableStateOf(false) }
+    videoTime = remember { mutableStateOf(0F) }
+    isSeekable = remember { mutableStateOf(false) }
 
     NativeDiscovery().discover()
     mediaPlayerComponent = remember {
