@@ -13,6 +13,7 @@ import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.*
 import com.wradecki.view.*
+import com.wradecki.view.helpers.recalculatePlayerHeight
 import com.wradecki.view.video.PlayerPanel
 
 fun main() = singleWindowApplication(
@@ -34,10 +35,12 @@ private fun FrameWindowScope.App() {
                 state = trayState,
                 icon = TrayIcon
             )
-            MenuRow(lists, trayState)
-            Column(modifier = Modifier.fillMaxSize().onSizeChanged {
-                workspaceHeight.value = it.height
-            }) {
+            MenuRow()
+            Column(
+                modifier = Modifier.fillMaxSize().onSizeChanged {
+                    workspaceHeight.value = it.height
+                    recalculatePlayerHeight()
+                }) {
                 PlayerPanel()
                 ListsPanel()
             }

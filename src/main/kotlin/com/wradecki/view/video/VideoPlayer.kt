@@ -13,6 +13,7 @@ import uk.co.caprica.vlcj.player.base.MediaPlayer
 import uk.co.caprica.vlcj.player.base.State
 import uk.co.caprica.vlcj.player.component.CallbackMediaPlayerComponent
 import uk.co.caprica.vlcj.player.component.EmbeddedMediaPlayerComponent
+import java.awt.Component
 
 val seekableAdapter = SeekableAdapter()
 
@@ -37,7 +38,7 @@ internal fun VideoPlayerImpl(url: String, modifier: Modifier) {
     )
 }
 
-fun Any.mediaPlayer(): MediaPlayer {
+fun Component.mediaPlayer(): MediaPlayer {
     return when (this) {
         is CallbackMediaPlayerComponent -> mediaPlayer()
         is EmbeddedMediaPlayerComponent -> mediaPlayer()

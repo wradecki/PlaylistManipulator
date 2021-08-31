@@ -10,6 +10,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.wradecki.view.*
+import com.wradecki.view.helpers.recalculatePlayerHeight
 import compose.icons.FontAwesomeIcons
 import compose.icons.fontawesomeicons.Solid
 import compose.icons.fontawesomeicons.solid.*
@@ -34,17 +35,12 @@ private fun FullScreenButton() {
     Button(
         onClick = {
             isFullScreen.value = isFullScreen.value.not()
-            if (isFullScreen.value) {
-                playerHeight.value = workspaceHeight.value - 100
-            } else {
-                playerHeight.value = 400
-            }
-
-        }
-    ) {
-        Icon(imageVector = if (isFullScreen.value) FontAwesomeIcons.Solid.ExpandArrowsAlt else FontAwesomeIcons.Solid.CompressArrowsAlt, "")
+            recalculatePlayerHeight()
+        }) {
+        Icon(imageVector = if (isFullScreen.value) FontAwesomeIcons.Solid.CompressArrowsAlt else FontAwesomeIcons.Solid.ExpandArrowsAlt, "")
     }
 }
+
 
 @Composable
 private fun NextChannelButton() {

@@ -12,12 +12,10 @@ import com.wradecki.model.Channel
 fun ChannelCard(singleChannel: Channel) {
     Row(horizontalArrangement = Arrangement.SpaceBetween, modifier = Modifier.fillMaxSize()) {
         Column {
-
             Descriptions(
                 "Name" to singleChannel.name,
                 "Url" to singleChannel.url
             )
-
         }
         NetworkImage(url = singleChannel.logoUrl)
     }

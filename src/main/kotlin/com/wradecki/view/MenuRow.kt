@@ -1,80 +1,48 @@
 package com.wradecki.view
 
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.window.FrameWindowScope
 import androidx.compose.ui.window.MenuBar
-import androidx.compose.ui.window.Notification
+import androidx.compose.ui.window.MenuScope
 import androidx.compose.ui.window.TrayState
-import com.wradecki.exporters.ExportFail
-import com.wradecki.exporters.ExportSuccess
-import com.wradecki.exporters.SltvExporter
 import com.wradecki.model.SingleList
-import com.wradecki.parsers.ParseFail
-import com.wradecki.parsers.ParseSuccess
-import com.wradecki.parsers.SltvParser
+import com.wradecki.view.helpers.parseList
+import com.wradecki.view.helpers.saveLists
+import java.awt.Component
 import java.io.File
 import javax.swing.JFileChooser
 import javax.swing.filechooser.FileNameExtensionFilter
 
+private val m3uFilter = FileNameExtensionFilter("SLTV", "m3u")
+
 @Composable
-fun FrameWindowScope.MenuRow(
-    lists: SnapshotStateList<SingleList>,
-    trayState: TrayState
-) {
+fun FrameWindowScope.MenuRow() {
     MenuBar {
         Menu("File", mnemonic = 'F') {
-            Item("Load list", onClick = {
-                var file: File?
-                JFileChooser().apply {
-                    fileFilter = FileNameExtensionFilter("SLTV", "m3u")
-                    showOpenDialog(null)
-                    file = selectedFile
-                }
-
-                if (file != null) {
-                    parseList(file, lists, trayState)
-                }
-            })
-            Item("Export list", onClick = {
-                var file: File?
-                JFileChooser().apply {
-                    fileFilter = FileNameExtensionFilter("SLTV", "m3u")
-                    showSaveDialog(null)
-                    file = selectedFile
-
-                }
-
-                if (file != null) {
-                    saveLists(file, lists, trayState)
-                }
-            })
+            ListMenuItem("Load list", ::parseList) { fc -> fc::showOpenDialog }
+            ListMenuItem("Export list", ::saveLists) { fc -> fc::showSaveDialog }
         }
     }
 }
 
-private fun parseList(file: File?, lists: MutableList<SingleList>, trayState: TrayState) {
-    val parser = SltvParser()
-    when (val result = parser.parse(file!!.path)) {
-        is ParseSuccess -> {
-            lists += result.list
-            trayState.sendNotification(Notification("Success", "List added successfully", Notification.Type.Info))
-        }
-        is ParseFail -> {
-            trayState.sendNotification(Notification("Error", result.error, Notification.Type.Error))
-        }
-    }
+@Composable
+private fun MenuScope.ListMenuItem(name: String, runMethod: (File, MutableList<SingleList>, TrayState) -> Unit, dialogFunction: (JFileChooser) -> (Component?) -> Unit) {
+    Item(name, onClick = {
+        chooseFile(runMethod, dialogFunction)
+    })
 }
 
+private val noComponent = null
 
-private fun saveLists(file: File?, lists: MutableList<SingleList>, trayState: TrayState) {
-    val exporter = SltvExporter()
-    when (val result = exporter.export(lists, file!!.path)) {
-        is ExportSuccess -> {
-            trayState.sendNotification(Notification("Success", "List exported successfully", Notification.Type.Info))
-        }
-        is ExportFail -> {
-            trayState.sendNotification(Notification("Error", result.error, Notification.Type.Error))
-        }
+private fun chooseFile(runMethod: (File, MutableList<SingleList>, TrayState) -> Unit, dialogFunction: (JFileChooser) -> (Component?) -> Unit) {
+    var file: File?
+    JFileChooser().apply {
+        fileFilter = m3uFilter
+        dialogFunction(this)(noComponent)
+        file = selectedFile
+    }
+
+    if (file != noComponent) {
+        runMethod(file!!, lists, trayState)
     }
 }
