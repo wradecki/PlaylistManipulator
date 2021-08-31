@@ -40,6 +40,8 @@ fun ListsPanel() {
                 channels += it.channels
                 currentGroup.value = it
                 refreshCurrentGroup(currentGroup, channels)
+            }, onSelect = { _, _ ->
+                refreshCurrentGroup(currentGroup, channels)
             })
         SimplePanel(
             "Channels",
