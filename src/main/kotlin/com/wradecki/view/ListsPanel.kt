@@ -11,7 +11,6 @@ import androidx.compose.ui.unit.dp
 import com.wradecki.model.Channel
 import com.wradecki.model.Group
 import com.wradecki.model.SingleList
-import com.wradecki.view.video.mediaPlayer
 import kotlinx.coroutines.launch
 
 @Composable
@@ -50,7 +49,6 @@ fun ListsPanel() {
             currentItem = currentChannel.value,
             onClick = {
                 playerUrl.value = it.url
-                isSeekable.value = mediaPlayerComponent.mediaPlayer().status().isSeekable
                 videoTime.value = 0F
                 isPlaying.value = true
                 currentChannel.value = it
