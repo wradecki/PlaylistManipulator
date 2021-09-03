@@ -34,7 +34,7 @@ internal class SltvContentMakerTest {
                         id = firstId,
                         name = firstName,
                         logoUrl = firstLogo,
-                        url = firstUrl
+                        url = firstUrl,
                     ),
                     Channel(
                         id = secondId,
@@ -78,13 +78,17 @@ internal class SltvContentMakerTest {
 
     @Test
     internal fun `When there is channel ----- Then first line is description line`() {
+        exampleList.select(true)
         val contentLines = sut.makeContent(listOf(exampleList))
+
+        println(contentLines)
 
         contentLines[1] shouldBeEqualTo """#EXTINF:-1 tvg-id="$firstId" tvg-name="$firstName" tvg-logo="$firstLogo" group-title="$groupName",$firstName"""
     }
 
     @Test
     internal fun `When there is channel ----- Then second line is url line`() {
+        exampleList.select(true)
         val contentLines = sut.makeContent(listOf(exampleList))
 
         contentLines[2] shouldBeEqualTo firstUrl
@@ -92,6 +96,7 @@ internal class SltvContentMakerTest {
 
     @Test
     internal fun `When there are two channel ----- Then second channel is there`() {
+        exampleList.select(true)
         val contentLines = sut.makeContent(listOf(exampleList))
 
         contentLines[3] shouldBeEqualTo """#EXTINF:-1 tvg-id="$secondId" tvg-name="$secondName" tvg-logo="$secondLogo" group-title="$groupName",$secondName"""
