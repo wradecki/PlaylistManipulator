@@ -39,11 +39,15 @@ tasks.withType<KotlinCompile>() {
 
 compose.desktop {
     application {
-        mainClass = "MainKt"
+        mainClass = "com.wradecki.MainKt"
         nativeDistributions {
-            targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
-            packageName = "PlaylistManipulator"
+            targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Exe, TargetFormat.Deb)
+            packageName = "Playlist Manipulator"
             packageVersion = "1.0.0"
+            windows {
+                shortcut = true
+                this.iconFile.set(project.file("src/main/resources/PLM_icon.ico"))
+            }
         }
     }
 }
