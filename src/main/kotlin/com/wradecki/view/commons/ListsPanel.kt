@@ -4,12 +4,8 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.width
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.wradecki.model.Channel
-import com.wradecki.model.Group
 import com.wradecki.model.SingleList
 import kotlinx.coroutines.launch
 
@@ -18,42 +14,42 @@ fun ListsPanel() {
     Row {
         SimplePanel("Lists",
             listModifier = Modifier.width(300.dp),
-            items = lists,
-            currentItem = currentList.value,
-            lazyListState = listListState,
+            items = listsState.lists,
+            currentItem = listsState.currentList.value,
+            lazyListState = listsState.listListState,
             onClick = {
-                groups.clear()
-                groups += it.groups
-                channels.clear()
-                currentList.value = it
+                listsState.groups.clear()
+                listsState.groups += it.groups
+                listsState.channels.clear()
+                listsState.currentList.value = it
             }, onSelect = { item, _ ->
-                refreshCurrentList(currentList, item, groups, currentGroup, channels)
+                refreshCurrentList(item)
             }
         )
         SimplePanel("Groups",
             listModifier = Modifier.width(400.dp),
-            items = groups,
-            currentItem = currentGroup.value,
-            lazyListState = groupListState,
+            items = listsState.groups,
+            currentItem = listsState.currentGroup.value,
+            lazyListState = listsState.groupListState,
             onClick = {
-                channels.clear()
-                channels += it.channels
-                currentGroup.value = it
-                refreshCurrentGroup(currentGroup, channels)
+                listsState.channels.clear()
+                listsState.channels += it.channels
+                listsState.currentGroup.value = it
+                refreshCurrentGroup()
             }, onSelect = { _, _ ->
-                refreshCurrentGroup(currentGroup, channels)
+                refreshCurrentGroup()
             })
         SimplePanel(
-            "Channels",
+            "Channels (${listsState.currentChannel.value?.name ?: String()})",
             listModifier = Modifier.fillMaxWidth(),
-            items = channels,
-            lazyListState = channelListState,
-            currentItem = currentChannel.value,
+            items = listsState.channels,
+            lazyListState = listsState.channelListState,
+            currentItem = listsState.currentChannel.value,
             onClick = {
-                playerUrl.value = it.url
-                videoTime.value = 0F
-                isPlaying.value = true
-                currentChannel.value = it
+                playerState.playerUrl.value = it.url
+                playerState.videoTime.value = 0F
+                playerState.isPlaying.value = true
+                listsState.currentChannel.value = it
             }
         ) { singleChannel ->
             ChannelCard(singleChannel)
@@ -63,31 +59,24 @@ fun ListsPanel() {
 
 
 private fun refreshCurrentList(
-    currentList: MutableState<SingleList?>,
-    item: SingleList,
-    groups: SnapshotStateList<Group>,
-    currentGroup: MutableState<Group?>,
-    channels: SnapshotStateList<Channel>
+    item: SingleList
 ) {
-    if (currentList.value == item) {
-        groups.clear()
-        groups += currentList.value!!.groups
-        coroutineScope.launch {
-            groupListState.animateScrollToItem(index = 0)
+    if (listsState.currentList.value == item) {
+        listsState.groups.clear()
+        listsState.groups += listsState.currentList.value!!.groups
+        globalState.coroutineScope.launch {
+            listsState.groupListState.animateScrollToItem(index = 0)
         }
-        refreshCurrentGroup(currentGroup, channels)
+        refreshCurrentGroup()
     }
 }
 
-private fun refreshCurrentGroup(
-    currentGroup: MutableState<Group?>,
-    channels: SnapshotStateList<Channel>
-) {
-    if (currentGroup.value != null) {
-        channels.clear()
-        channels += currentGroup.value!!.channels
-        coroutineScope.launch {
-            channelListState.scrollToItem(index = 0)
+private fun refreshCurrentGroup() {
+    if (listsState.currentGroup.value != null) {
+        listsState.channels.clear()
+        listsState.channels += listsState.currentGroup.value!!.channels
+        globalState.coroutineScope.launch {
+            listsState.channelListState.scrollToItem(index = 0)
         }
     }
 }

@@ -7,26 +7,24 @@ import androidx.compose.material.Slider
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.wradecki.view.isSeekable
-import com.wradecki.view.mediaPlayerComponent
-import com.wradecki.view.videoTime
+import com.wradecki.view.playerState
 
 @Composable
 fun PlaytimeSlider() {
-    if (isSeekable.value) {
+    if (playerState.isSeekable.value) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = 100.dp)
         ) {
             Slider(
-                value = videoTime.value,
+                value = playerState.videoTime.value,
                 onValueChange = {
-                    videoTime.value = it
+                    playerState.videoTime.value = it
                     if (it > 0.99F) {
-                        mediaPlayerComponent.mediaPlayer().controls().setPosition(0.99F)
+                        playerState.mediaPlayerComponent.mediaPlayer().controls().setPosition(0.99F)
                     } else {
-                        mediaPlayerComponent.mediaPlayer().controls().setPosition(it)
+                        playerState.mediaPlayerComponent.mediaPlayer().controls().setPosition(it)
                     }
                 },
                 modifier = Modifier.fillMaxWidth(),

@@ -12,7 +12,7 @@ import com.wradecki.view.video.PlayerPanel
 fun MainView() {
     Column(
         modifier = Modifier.fillMaxSize().onSizeChanged {
-            workspaceHeight.value = it.height
+            globalState.workspaceHeight.value = it.height
             recalculatePlayerHeight()
         }) {
         PlayerPanel()

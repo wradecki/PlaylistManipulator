@@ -1,102 +1,136 @@
 package com.wradecki.view
 
-import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.runtime.*
-import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.text.input.TextFieldValue
-import androidx.compose.ui.window.TrayState
 import androidx.compose.ui.window.rememberTrayState
-import com.wradecki.model.Channel
-import com.wradecki.model.Group
-import com.wradecki.model.SingleList
-import kotlinx.coroutines.CoroutineScope
+import com.wradecki.view.state.GlobalState
+import com.wradecki.view.state.ListsState
+import com.wradecki.view.state.PlayerState
+import com.wradecki.view.state.data.ApplicationData
+import com.wradecki.view.state.data.ListsData
+import kotlinx.serialization.decodeFromString
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 import uk.co.caprica.vlcj.factory.discovery.NativeDiscovery
 import uk.co.caprica.vlcj.player.component.CallbackMediaPlayerComponent
 import uk.co.caprica.vlcj.player.component.EmbeddedMediaPlayerComponent
-import java.awt.Component
+import java.io.File
 import java.util.*
 
-lateinit var mediaPlayerComponent: Component
-lateinit var coroutineScope: CoroutineScope
+lateinit var globalState: GlobalState
+lateinit var listsState: ListsState
+lateinit var playerState: PlayerState
 
-lateinit var trayState: TrayState
-
-lateinit var workspaceHeight: MutableState<Int>
-
-lateinit var playerUrl: MutableState<String>
-lateinit var playerHeight: MutableState<Int>
-lateinit var isPlaying: MutableState<Boolean>
-lateinit var isFullScreen: MutableState<Boolean>
-lateinit var videoTime: MutableState<Float>
-lateinit var isSeekable: MutableState<Boolean>
-
-lateinit var lists: SnapshotStateList<SingleList>
-lateinit var groups: SnapshotStateList<Group>
-lateinit var channels: SnapshotStateList<Channel>
-
-lateinit var currentList: MutableState<SingleList?>
-lateinit var currentGroup: MutableState<Group?>
-lateinit var currentChannel: MutableState<Channel?>
-
-lateinit var listListState: LazyListState
-lateinit var groupListState: LazyListState
-lateinit var channelListState: LazyListState
-
-lateinit var listSearchState: MutableState<TextFieldValue>
-lateinit var groupSearchState: MutableState<TextFieldValue>
-lateinit var channelSearchState: MutableState<TextFieldValue>
-
+val settings = File(".settings")
 
 @Composable
 fun InitState() {
-    coroutineScope = rememberCoroutineScope()
-
-    trayState = rememberTrayState()
-
-    workspaceHeight = remember { mutableStateOf(900) }
-
+    InitGlobal()
     initPlayer()
     initLists()
+    LoadState()
+}
+
+
+fun saveState() {
+    val data = ApplicationData(
+        listDataFromState(listsState)
+    )
+
+    val json = Json.encodeToString(data)
+
+    println(settings)
+    println(settings.absolutePath)
+    settings.writeText(json)
+}
+
+
+fun listDataFromState(listsState: ListsState): ListsData {
+    return ListsData(
+        lists = listsState.lists,
+        groups = listsState.groups,
+        channels = listsState.channels,
+        currentList = listsState.currentList.value,
+        currentGroup = listsState.currentGroup.value,
+        currentChannel = listsState.currentChannel.value,
+        listSearch = listsState.listSearchState.value.text,
+        groupSearch = listsState.groupSearchState.value.text,
+        channelSearch = listsState.channelSearchState.value.text,
+    )
+}
+
+
+@Composable
+fun LoadState() {
+    if (settings.exists()) {
+        val settings = Json.decodeFromString<ApplicationData>(settings.readText())
+        fromDataToState(settings)
+    }
+}
+
+fun fromDataToState(data: ApplicationData) {
+
+    listsState.lists.addAll(data.listsData.lists)
+    listsState.groups.addAll(data.listsData.groups)
+    listsState.channels.addAll(data.listsData.channels)
+    listsState.currentList.value = data.listsData.currentList
+    listsState.currentGroup.value = data.listsData.currentGroup
+    listsState.currentChannel.value = data.listsData.currentChannel
+
+    println(data.listsData.listSearch)
+    println(data.listsData.groupSearch)
+    println(data.listsData.channelSearch)
+    listsState.listSearchState.value = TextFieldValue(data.listsData.listSearch)
+    listsState.groupSearchState.value = TextFieldValue(data.listsData.groupSearch)
+    listsState.channelSearchState.value = TextFieldValue(data.listsData.channelSearch)
+}
+
+@Composable
+private fun InitGlobal() {
+    globalState = GlobalState(
+        coroutineScope = rememberCoroutineScope(),
+        trayState = rememberTrayState(),
+        workspaceHeight = remember { mutableStateOf(900) }
+    )
 }
 
 @Composable
 private fun initLists() {
-    lists = remember { mutableStateListOf() }
-    groups = remember { mutableStateListOf() }
-    channels = remember { mutableStateListOf() }
-
-    currentList = remember { mutableStateOf(null) }
-    currentGroup = remember { mutableStateOf(null) }
-    currentChannel = remember { mutableStateOf(null) }
-
-
-    listListState = rememberLazyListState(0)
-    groupListState = rememberLazyListState(0)
-    channelListState = rememberLazyListState(0)
-
-    listSearchState = remember { mutableStateOf(TextFieldValue()) }
-    groupSearchState = remember { mutableStateOf(TextFieldValue()) }
-    channelSearchState = remember { mutableStateOf(TextFieldValue()) }
+    listsState = ListsState(
+        lists = remember { mutableStateListOf() },
+        groups = remember { mutableStateListOf() },
+        channels = remember { mutableStateListOf() },
+        currentList = remember { mutableStateOf(null) },
+        currentGroup = remember { mutableStateOf(null) },
+        currentChannel = remember { mutableStateOf(null) },
+        listListState = rememberLazyListState(0),
+        groupListState = rememberLazyListState(0),
+        channelListState = rememberLazyListState(0),
+        listSearchState = remember { mutableStateOf(TextFieldValue()) },
+        groupSearchState = remember { mutableStateOf(TextFieldValue()) },
+        channelSearchState = remember { mutableStateOf(TextFieldValue()) },
+    )
 }
 
 @Composable
 private fun initPlayer() {
-    playerUrl = remember { mutableStateOf("") }
-    playerHeight = remember { mutableStateOf(400) }
-    isPlaying = remember { mutableStateOf(true) }
-    isFullScreen = remember { mutableStateOf(false) }
-    videoTime = remember { mutableStateOf(0F) }
-    isSeekable = remember { mutableStateOf(false) }
-
     NativeDiscovery().discover()
-    mediaPlayerComponent = remember {
-        if (isMacOS()) {
-            CallbackMediaPlayerComponent()
-        } else {
-            EmbeddedMediaPlayerComponent()
+    playerState = PlayerState(
+        playerUrl = remember { mutableStateOf("") },
+        playerHeight = remember { mutableStateOf(400) },
+        isPlaying = remember { mutableStateOf(true) },
+        isFullScreen = remember { mutableStateOf(false) },
+        videoTime = remember { mutableStateOf(0F) },
+        isSeekable = remember { mutableStateOf(false) },
+        mediaPlayerComponent = remember {
+            if (isMacOS()) {
+                CallbackMediaPlayerComponent()
+            } else {
+                EmbeddedMediaPlayerComponent()
+            }
         }
-    }
+    )
 }
 
 

@@ -4,6 +4,7 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
     kotlin("jvm") version "1.5.21"
+    kotlin("plugin.serialization") version "1.5.21"
     id("org.jetbrains.compose") version "1.0.0-alpha3"
 }
 
@@ -25,6 +26,7 @@ dependencies {
     // https://mvnrepository.com/artifact/uk.co.caprica/vlcj
     implementation("uk.co.caprica:vlcj:4.7.1")
     implementation("br.com.devsrsouza.compose.icons.jetbrains:font-awesome:1.0.0")
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.3.0-RC")
 }
 
 tasks.test {

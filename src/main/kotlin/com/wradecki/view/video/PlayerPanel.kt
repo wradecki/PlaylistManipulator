@@ -7,14 +7,13 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.wradecki.view.playerHeight
-import com.wradecki.view.playerUrl
+import com.wradecki.view.playerState
 
 @Composable
 fun PlayerPanel() {
-    if (playerUrl.value.isNotBlank()) {
-        Row(modifier = Modifier.fillMaxWidth().height(playerHeight.value.dp)) {
-            VideoPlayer(playerUrl.value, modifier = Modifier.fillMaxSize())
+    if (playerState.playerUrl.value.isNotBlank()) {
+        Row(modifier = Modifier.fillMaxWidth().height(playerState.playerHeight.value.dp)) {
+            VideoPlayer(playerState.playerUrl.value, modifier = Modifier.fillMaxSize())
         }
         PlaytimeSlider()
         VideoPlayerButtons()

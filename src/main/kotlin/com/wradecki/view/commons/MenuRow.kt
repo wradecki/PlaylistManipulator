@@ -43,6 +43,6 @@ private fun chooseFile(runMethod: (File, MutableList<SingleList>, TrayState) -> 
     }
 
     if (file != noComponent) {
-        runMethod(file!!, lists, trayState)
+        runMethod(file!!, listsState.lists, globalState.trayState)
     }
 }

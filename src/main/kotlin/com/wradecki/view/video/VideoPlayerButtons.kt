@@ -9,8 +9,9 @@ import androidx.compose.material.Icon
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.wradecki.view.*
 import com.wradecki.view.helpers.recalculatePlayerHeight
+import com.wradecki.view.listsState
+import com.wradecki.view.playerState
 import compose.icons.FontAwesomeIcons
 import compose.icons.fontawesomeicons.Solid
 import compose.icons.fontawesomeicons.solid.*
@@ -34,10 +35,10 @@ fun VideoPlayerButtons() {
 private fun FullScreenButton() {
     Button(
         onClick = {
-            isFullScreen.value = isFullScreen.value.not()
+            playerState.isFullScreen.value = playerState.isFullScreen.value.not()
             recalculatePlayerHeight()
         }) {
-        Icon(imageVector = if (isFullScreen.value) FontAwesomeIcons.Solid.CompressArrowsAlt else FontAwesomeIcons.Solid.ExpandArrowsAlt, "")
+        Icon(imageVector = if (playerState.isFullScreen.value) FontAwesomeIcons.Solid.CompressArrowsAlt else FontAwesomeIcons.Solid.ExpandArrowsAlt, "")
     }
 }
 
@@ -46,18 +47,18 @@ private fun FullScreenButton() {
 private fun NextChannelButton() {
     Button(
         onClick = {
-            if (channels.isNotEmpty()) {
-                if (currentChannel.value != null) {
-                    var index = channels.lastIndexOf(currentChannel.value)
-                    if (index < channels.lastIndex) {
+            if (listsState.channels.isNotEmpty()) {
+                if (listsState.currentChannel.value != null) {
+                    var index = listsState.channels.lastIndexOf(listsState.currentChannel.value)
+                    if (index < listsState.channels.lastIndex) {
                         index++
                     }
-                    currentChannel.value = channels[index]
-                    mediaPlayerComponent.mediaPlayer().media().play(currentChannel.value!!.url)
-                    isPlaying.value = true
+                    listsState.currentChannel.value = listsState.channels[index]
+                    playerState.mediaPlayerComponent.mediaPlayer().media().play(listsState.currentChannel.value!!.url)
+                    playerState.isPlaying.value = true
                 }
             }
-        }, enabled = (currentChannel.value != null && channels.lastIndexOf(currentChannel.value) < channels.lastIndex)
+        }, enabled = (listsState.currentChannel.value != null && listsState.channels.lastIndexOf(listsState.currentChannel.value) < listsState.channels.lastIndex)
     ) {
         Icon(imageVector = FontAwesomeIcons.Solid.StepForward, "")
     }
@@ -66,20 +67,24 @@ private fun NextChannelButton() {
 @Composable
 private fun StopButton() {
     Button(onClick = {
-        mediaPlayerComponent.mediaPlayer().controls().stop()
-        playerUrl.value = ""
-        isPlaying.value = false
+        stopPlayer()
     }) {
         Icon(imageVector = FontAwesomeIcons.Solid.Stop, "")
     }
 }
 
+fun stopPlayer() {
+    playerState.mediaPlayerComponent.mediaPlayer().controls().stop()
+    playerState.playerUrl.value = ""
+    playerState.isPlaying.value = false
+}
+
 @Composable
 private fun PauseButton() {
-    if (isPlaying.value) {
+    if (playerState.isPlaying.value) {
         Button(onClick = {
-            mediaPlayerComponent.mediaPlayer().controls().pause()
-            isPlaying.value = false
+            playerState.mediaPlayerComponent.mediaPlayer().controls().pause()
+            playerState.isPlaying.value = false
         }) {
             Icon(imageVector = FontAwesomeIcons.Solid.Pause, "")
         }
@@ -88,10 +93,10 @@ private fun PauseButton() {
 
 @Composable
 private fun PlayButton() {
-    if (!isPlaying.value) {
+    if (!playerState.isPlaying.value) {
         Button(onClick = {
-            mediaPlayerComponent.mediaPlayer().controls().play()
-            isPlaying.value = true
+            playerState.mediaPlayerComponent.mediaPlayer().controls().play()
+            playerState.isPlaying.value = true
         }) {
             Icon(imageVector = FontAwesomeIcons.Solid.Play, "")
         }
@@ -102,18 +107,18 @@ private fun PlayButton() {
 private fun PreviousChannelButton() {
     Button(
         onClick = {
-            if (channels.isNotEmpty()) {
-                if (currentChannel.value != null) {
-                    var index = channels.lastIndexOf(currentChannel.value)
+            if (listsState.channels.isNotEmpty()) {
+                if (listsState.currentChannel.value != null) {
+                    var index = listsState.channels.lastIndexOf(listsState.currentChannel.value)
                     if (index > 0) {
                         index--
                     }
-                    currentChannel.value = channels[index]
-                    mediaPlayerComponent.mediaPlayer().media().play(currentChannel.value!!.url)
-                    isPlaying.value = true
+                    listsState.currentChannel.value = listsState.channels[index]
+                    playerState.mediaPlayerComponent.mediaPlayer().media().play(listsState.currentChannel.value!!.url)
+                    playerState.isPlaying.value = true
                 }
             }
-        }, enabled = currentChannel.value != null && channels.lastIndexOf(currentChannel.value) > 0
+        }, enabled = listsState.currentChannel.value != null && listsState.channels.lastIndexOf(listsState.currentChannel.value) > 0
     ) {
         Icon(imageVector = FontAwesomeIcons.Solid.StepBackward, "")
     }

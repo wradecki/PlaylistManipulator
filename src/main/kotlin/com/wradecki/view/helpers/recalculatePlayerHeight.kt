@@ -1,13 +1,12 @@
 package com.wradecki.view.helpers
 
-import com.wradecki.view.isFullScreen
-import com.wradecki.view.playerHeight
-import com.wradecki.view.workspaceHeight
+import com.wradecki.view.globalState
+import com.wradecki.view.playerState
 
 fun recalculatePlayerHeight() {
-    if (isFullScreen.value) {
-        playerHeight.value = workspaceHeight.value - 100
+    if (playerState.isFullScreen.value) {
+        playerState.playerHeight.value = globalState.workspaceHeight.value - 100
     } else {
-        playerHeight.value = 400
+        playerState.playerHeight.value = 400
     }
 }

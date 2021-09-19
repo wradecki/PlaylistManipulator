@@ -11,24 +11,35 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.*
 import com.wradecki.view.*
+import com.wradecki.view.video.stopPlayer
 
-fun main() = singleWindowApplication(
-    title = "Playlist manipulator",
-    icon = MyAppIcon,
-    state = WindowState(size = WindowSize(1600.dp, 900.dp))
-) {
-    App()
+
+fun main() = application {
+    InitState()
+    Window(
+        ::exit,
+        state = WindowState(size = WindowSize(1600.dp, 900.dp)),
+        title = "Playlist Manipulator",
+        icon = MyAppIcon,
+    ) {
+        App()
+    }
+}
+
+fun ApplicationScope.exit() {
+    stopPlayer()
+    saveState()
+    exitApplication()
 }
 
 @Composable
 @Preview
 private fun FrameWindowScope.App() {
-    InitState()
 
     DesktopMaterialTheme(colors = darkColors()) {
         Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colors.surface) {
             Tray(
-                state = trayState,
+                state = globalState.trayState,
                 icon = MyAppIcon
             )
             MenuRow()
