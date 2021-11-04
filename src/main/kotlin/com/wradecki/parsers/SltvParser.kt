@@ -13,7 +13,7 @@ class SltvParser : Parser {
         val lines = file.readLines()
         if (lines.isEmpty())
             return ParseFail(EMPTY)
-        if (lines[0] != header) {
+        if (!lines[0].startsWith(header)) {
             return ParseFail(NO_HEADER)
         }
 
