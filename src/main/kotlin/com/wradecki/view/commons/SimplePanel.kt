@@ -12,6 +12,9 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
@@ -30,6 +33,7 @@ fun <T : Selectable> SimplePanel(
     onSelect: (T, Boolean) -> Unit = { _, _ -> },
     descriptionPanel: @Composable (T) -> Unit = { Text(text = it.name, modifier = Modifier.fillMaxHeight()) }
 ) {
+    val focusRequester = remember { FocusRequester() }
     Column(
         modifier = listModifier
             .fillMaxHeight()
@@ -39,11 +43,20 @@ fun <T : Selectable> SimplePanel(
         Text(header, fontStyle = MaterialTheme.typography.h1.fontStyle, textAlign = TextAlign.Center, modifier = Modifier.fillMaxWidth())
 
         TextField(
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier
+                .fillMaxWidth()
+                .focusRequester(focusRequester)
+                .focusable(false)
+                .onFocusChanged {
+                    listsState.isSearching.value = it.hasFocus
+                }
                 .padding(15.dp),
             value = textState.value,
             onValueChange = { text ->
                 textState.value = text
+                if(text.text == "exit"){
+                    globalState.hiddenFocus.requestFocus()
+                }
             }
         )
         LazyColumn(

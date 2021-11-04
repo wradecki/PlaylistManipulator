@@ -2,6 +2,7 @@ package com.wradecki.view
 
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.runtime.*
+import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.window.rememberTrayState
 import com.wradecki.view.state.GlobalState
@@ -23,7 +24,6 @@ lateinit var listsState: ListsState
 lateinit var playerState: PlayerState
 
 val settings = File(".settings")
-
 @Composable
 fun InitState() {
     InitGlobal()
@@ -91,7 +91,8 @@ private fun InitGlobal() {
     globalState = GlobalState(
         coroutineScope = rememberCoroutineScope(),
         trayState = rememberTrayState(),
-        workspaceHeight = remember { mutableStateOf(900) }
+        workspaceHeight = remember { mutableStateOf(900) },
+        hiddenFocus = remember { FocusRequester() }
     )
 }
 
@@ -110,6 +111,7 @@ private fun initLists() {
         listSearchState = remember { mutableStateOf(TextFieldValue()) },
         groupSearchState = remember { mutableStateOf(TextFieldValue()) },
         channelSearchState = remember { mutableStateOf(TextFieldValue()) },
+        isSearching = remember { mutableStateOf(false) }
     )
 }
 

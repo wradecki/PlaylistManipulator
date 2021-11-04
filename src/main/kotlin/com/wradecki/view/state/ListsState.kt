@@ -21,4 +21,5 @@ data class ListsState(
     var listSearchState: MutableState<TextFieldValue>,
     var groupSearchState: MutableState<TextFieldValue>,
     var channelSearchState: MutableState<TextFieldValue>,
+    var isSearching: MutableState<Boolean>,
 )

@@ -35,11 +35,15 @@ fun VideoPlayerButtons() {
 private fun FullScreenButton() {
     Button(
         onClick = {
-            playerState.isFullScreen.value = playerState.isFullScreen.value.not()
-            recalculatePlayerHeight()
+            fullScreenPlayer()
         }) {
         Icon(imageVector = if (playerState.isFullScreen.value) FontAwesomeIcons.Solid.CompressArrowsAlt else FontAwesomeIcons.Solid.ExpandArrowsAlt, "")
     }
+}
+
+fun fullScreenPlayer() {
+    playerState.isFullScreen.value = playerState.isFullScreen.value.not()
+    recalculatePlayerHeight()
 }
 
 
@@ -47,20 +51,22 @@ private fun FullScreenButton() {
 private fun NextChannelButton() {
     Button(
         onClick = {
-            if (listsState.channels.isNotEmpty()) {
-                if (listsState.currentChannel.value != null) {
-                    var index = listsState.channels.lastIndexOf(listsState.currentChannel.value)
-                    if (index < listsState.channels.lastIndex) {
-                        index++
-                    }
-                    listsState.currentChannel.value = listsState.channels[index]
-                    playerState.mediaPlayerComponent.mediaPlayer().media().play(listsState.currentChannel.value!!.url)
-                    playerState.isPlaying.value = true
-                }
-            }
+            nextPlayer()
         }, enabled = (listsState.currentChannel.value != null && listsState.channels.lastIndexOf(listsState.currentChannel.value) < listsState.channels.lastIndex)
     ) {
         Icon(imageVector = FontAwesomeIcons.Solid.StepForward, "")
+    }
+}
+
+fun nextPlayer() {
+    if (isSelected()) {
+        var index = listsState.channels.lastIndexOf(listsState.currentChannel.value)
+        if (index < listsState.channels.lastIndex) {
+            index++
+        }
+        listsState.currentChannel.value = listsState.channels[index]
+        playerState.mediaPlayerComponent.mediaPlayer().media().play(listsState.currentChannel.value!!.url)
+        playerState.isPlaying.value = true
     }
 }
 
@@ -83,23 +89,39 @@ fun stopPlayer() {
 private fun PauseButton() {
     if (playerState.isPlaying.value) {
         Button(onClick = {
-            playerState.mediaPlayerComponent.mediaPlayer().controls().pause()
-            playerState.isPlaying.value = false
+            pausePlayer()
         }) {
             Icon(imageVector = FontAwesomeIcons.Solid.Pause, "")
         }
     }
 }
 
+private fun pausePlayer() {
+    playerState.mediaPlayerComponent.mediaPlayer().controls().pause()
+    playerState.isPlaying.value = false
+}
+
 @Composable
 private fun PlayButton() {
     if (!playerState.isPlaying.value) {
         Button(onClick = {
-            playerState.mediaPlayerComponent.mediaPlayer().controls().play()
-            playerState.isPlaying.value = true
+            playPlayer()
         }) {
             Icon(imageVector = FontAwesomeIcons.Solid.Play, "")
         }
+    }
+}
+
+private fun playPlayer() {
+    playerState.mediaPlayerComponent.mediaPlayer().controls().play()
+    playerState.isPlaying.value = true
+}
+
+fun pausePlayPlayer() {
+    if (playerState.isPlaying.value) {
+        pausePlayer()
+    } else {
+        playPlayer()
     }
 }
 
@@ -107,19 +129,23 @@ private fun PlayButton() {
 private fun PreviousChannelButton() {
     Button(
         onClick = {
-            if (listsState.channels.isNotEmpty()) {
-                if (listsState.currentChannel.value != null) {
-                    var index = listsState.channels.lastIndexOf(listsState.currentChannel.value)
-                    if (index > 0) {
-                        index--
-                    }
-                    listsState.currentChannel.value = listsState.channels[index]
-                    playerState.mediaPlayerComponent.mediaPlayer().media().play(listsState.currentChannel.value!!.url)
-                    playerState.isPlaying.value = true
-                }
-            }
+            prevPlayer()
         }, enabled = listsState.currentChannel.value != null && listsState.channels.lastIndexOf(listsState.currentChannel.value) > 0
     ) {
         Icon(imageVector = FontAwesomeIcons.Solid.StepBackward, "")
     }
 }
+
+fun prevPlayer() {
+    if (isSelected()) {
+        var index = listsState.channels.lastIndexOf(listsState.currentChannel.value)
+        if (index > 0) {
+            index--
+        }
+        listsState.currentChannel.value = listsState.channels[index]
+        playerState.mediaPlayerComponent.mediaPlayer().media().play(listsState.currentChannel.value!!.url)
+        playerState.isPlaying.value = true
+    }
+}
+
+private fun isSelected() = listsState.channels.isNotEmpty() && listsState.currentChannel.value != null
