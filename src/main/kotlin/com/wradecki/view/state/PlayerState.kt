@@ -10,5 +10,6 @@ data class PlayerState(
     var isPlaying: MutableState<Boolean>,
     var isFullScreen: MutableState<Boolean>,
     var videoTime: MutableState<Float>,
+    var volume: MutableState<Float>,
     var isSeekable: MutableState<Boolean>,
 )

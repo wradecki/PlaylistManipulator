@@ -124,6 +124,7 @@ private fun initPlayer() {
         isPlaying = remember { mutableStateOf(true) },
         isFullScreen = remember { mutableStateOf(false) },
         videoTime = remember { mutableStateOf(0F) },
+        volume = remember { mutableStateOf(0F) },
         isSeekable = remember { mutableStateOf(false) },
         mediaPlayerComponent = remember {
             if (isMacOS()) {
