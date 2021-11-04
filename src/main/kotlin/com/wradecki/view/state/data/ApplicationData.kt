@@ -8,6 +8,7 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class ApplicationData(
     val listsData: ListsData,
+    val playerData: PlayerData = PlayerData()
 )
 
 
@@ -22,4 +23,9 @@ data class ListsData(
     var listSearch: String,
     var groupSearch: String,
     var channelSearch: String,
+)
+
+@Serializable
+data class PlayerData(
+    var volume: Float = 1F
 )

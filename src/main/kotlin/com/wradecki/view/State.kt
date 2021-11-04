@@ -10,6 +10,8 @@ import com.wradecki.view.state.ListsState
 import com.wradecki.view.state.PlayerState
 import com.wradecki.view.state.data.ApplicationData
 import com.wradecki.view.state.data.ListsData
+import com.wradecki.view.state.data.PlayerData
+import com.wradecki.view.video.setVolume
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
@@ -35,7 +37,8 @@ fun InitState() {
 
 fun saveState() {
     val data = ApplicationData(
-        listDataFromState(listsState)
+        listsData = listDataFromState(listsState),
+        playerData = playerDataFromState(playerState)
     )
 
     val json = Json.encodeToString(data)
@@ -43,6 +46,12 @@ fun saveState() {
     println(settings)
     println(settings.absolutePath)
     settings.writeText(json)
+}
+
+fun playerDataFromState(playerState: PlayerState): PlayerData {
+    return PlayerData(
+        volume = playerState.volume.value
+    )
 }
 
 
@@ -70,7 +79,6 @@ fun LoadState() {
 }
 
 fun fromDataToState(data: ApplicationData) {
-
     listsState.lists.addAll(data.listsData.lists)
     listsState.groups.addAll(data.listsData.groups)
     listsState.channels.addAll(data.listsData.channels)
@@ -78,12 +86,12 @@ fun fromDataToState(data: ApplicationData) {
     listsState.currentGroup.value = data.listsData.currentGroup
     listsState.currentChannel.value = data.listsData.currentChannel
 
-    println(data.listsData.listSearch)
-    println(data.listsData.groupSearch)
-    println(data.listsData.channelSearch)
     listsState.listSearchState.value = TextFieldValue(data.listsData.listSearch)
     listsState.groupSearchState.value = TextFieldValue(data.listsData.groupSearch)
     listsState.channelSearchState.value = TextFieldValue(data.listsData.channelSearch)
+
+    playerState.volume.value = data.playerData.volume
+    setVolume(data.playerData.volume)
 }
 
 @Composable
