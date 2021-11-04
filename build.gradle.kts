@@ -19,7 +19,7 @@ repositories {
 }
 
 dependencies {
-    testImplementation("org.junit.jupiter:junit-jupiter:5.7.2")
+    testImplementation("org.junit.jupiter:junit-jupiter:5.8.0")
     testImplementation("org.amshove.kluent:kluent:1.68")
     testImplementation(kotlin("test"))
     implementation(compose.desktop.currentOs)
@@ -34,7 +34,7 @@ tasks.test {
 }
 
 tasks.withType<KotlinCompile>() {
-    kotlinOptions.jvmTarget = "16"
+    kotlinOptions.jvmTarget = "11"
 
 
 }
