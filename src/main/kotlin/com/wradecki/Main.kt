@@ -10,10 +10,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.focusTarget
-import androidx.compose.ui.input.key.Key
-import androidx.compose.ui.input.key.KeyEventType
-import androidx.compose.ui.input.key.key
-import androidx.compose.ui.input.key.type
+import androidx.compose.ui.input.key.*
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.*
 import com.wradecki.view.*
@@ -30,14 +27,8 @@ fun main() = application {
         icon = MyAppIcon,
         onKeyEvent = {
             val playerState: Boolean = playerState.playerUrl.value.isNotEmpty()
-            if (playerState && it.type == KeyEventType.KeyUp && !listsState.isSearching.value) {
-                when (it.key) {
-                    Key.Spacebar -> pausePlayPlayer()
-                    Key.N -> nextPlayer()
-                    Key.B -> prevPlayer()
-                    Key.F -> fullScreenPlayer()
-                    Key.S -> stopPlayer()
-                }
+            if (playerIsActive(playerState, it)) {
+                handlePlayerKeyboard(it)
             } else if (it.key == Key.Escape){
                 globalState.hiddenFocus.requestFocus()
             }
@@ -50,6 +41,19 @@ fun main() = application {
         App()
     }
 }
+
+@OptIn(ExperimentalComposeUiApi::class)
+private fun handlePlayerKeyboard(it: KeyEvent) {
+    when (it.key) {
+        Key.Spacebar -> pausePlayPlayer()
+        Key.N -> nextPlayer()
+        Key.B -> prevPlayer()
+        Key.F -> fullScreenPlayer()
+        Key.S -> stopPlayer()
+    }
+}
+
+private fun playerIsActive(playerState: Boolean, it: KeyEvent) = playerState && it.type == KeyEventType.KeyUp && !listsState.isSearching.value
 
 fun ApplicationScope.exit() {
     stopPlayer()
