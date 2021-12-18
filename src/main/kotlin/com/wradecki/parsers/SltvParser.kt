@@ -10,14 +10,14 @@ class SltvParser : Parser {
 
     override fun parse(filePath: String): ParseResult {
         val file = File(filePath)
-        val lines = file.readLines()
+        val lines = file.readLines().filter { line -> line.trim().isNotEmpty() }
         if (lines.isEmpty())
             return ParseFail(EMPTY)
         if (!lines[0].startsWith(header)) {
             return ParseFail(NO_HEADER)
         }
 
-        val channelsMap = parseChannels(lines)
+        val channelsMap = parseChannels(lines.dropWhile { f -> f.startsWith("#EXTINF") })
         val groups = createGroups(channelsMap)
 
         return ParseSuccess(SingleList(file.name, file.path, groups))
@@ -32,7 +32,7 @@ class SltvParser : Parser {
 
     private fun parseChannels(lines: List<String>): MutableMap<GroupName, MutableList<Channel>> {
         val channels = mutableMapOf<GroupName, MutableList<Channel>>()
-        for (index in 1 until lines.size step 2) {
+        for (index in 0 until lines.size step 2) {
             parseSingleChannel(lines, index, channels)
         }
         return channels
